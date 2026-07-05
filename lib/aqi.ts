@@ -468,3 +468,18 @@ export const POLLUTANT_INFO = {
     ],
   },
 } as const;
+
+// ─── Safe accessors (bypass `as const` narrowing for component use) ──────────
+export function getPollutantStandards(key: string): RegulatoryStandard[] {
+  return (REGULATORY_STANDARDS as Record<string, RegulatoryStandard[]>)[key] ?? [];
+}
+
+export function getPollutantNairobiContext(key: string): string | null {
+  const info = (POLLUTANT_INFO as Record<string, Record<string, unknown>>)[key];
+  return (info?.nairobiContext as string) ?? null;
+}
+
+export function getPollutantFairmode(key: string): string | null {
+  const info = (POLLUTANT_INFO as Record<string, Record<string, unknown>>)[key];
+  return (info?.fairmode as string) ?? null;
+}

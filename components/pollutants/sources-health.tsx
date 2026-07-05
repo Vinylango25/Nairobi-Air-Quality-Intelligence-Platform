@@ -1,10 +1,10 @@
 'use client';
 import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
-  PieChart, Pie, Legend,
+  Tooltip, ResponsiveContainer, Cell,
+  PieChart, Pie,
 } from 'recharts';
-import { POLLUTANT_INFO } from '@/lib/aqi';
-import { TOOLTIP_STYLE, AXIS_TICK, type PollutantKey } from './header';
+import { POLLUTANT_INFO, getPollutantNairobiContext, getPollutantFairmode } from '@/lib/aqi';
+import { TOOLTIP_STYLE, type PollutantKey } from './header';
 
 // ─── FAIRMODE source apportionment data per pollutant ────────────────────────
 // Source: FAIRMODE/EMEP methodology applied to Nairobi emission inventory
@@ -51,9 +51,12 @@ const SOURCE_APPORTIONMENT: Record<string, { name: string; pct: number; color: s
   ],
 };
 
-// ─── Sources + health effects panel ──────────────────────────────────────────
+// ─── Sources + Health Effects ─────────────────────────────────────────────────
 export function SourcesAndHealth({ pollutantKey }: { pollutantKey: PollutantKey }) {
   const info = POLLUTANT_INFO[pollutantKey];
+  const nairobiContext = getPollutantNairobiContext(pollutantKey);
+  const fairmode = getPollutantFairmode(pollutantKey);
+
   return (
     <div className="rounded-2xl border border-gray-800 bg-gray-900/60 p-4 sm:p-5 space-y-5">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -88,11 +91,19 @@ export function SourcesAndHealth({ pollutantKey }: { pollutantKey: PollutantKey 
         </div>
       </div>
 
-      {/* FAIRMODE source apportionment */}
-      {'fairmode' in info && info.fairmode && (
+      {/* Nairobi context — via safe accessor, not 'in' check */}
+      {nairobiContext && (
+        <div className="rounded-xl border border-teal-800/40 bg-teal-950/20 p-3">
+          <p className="text-xs font-bold text-teal-400 mb-1">🌍 Nairobi Context</p>
+          <p className="text-xs text-gray-300 leading-relaxed">{nairobiContext}</p>
+        </div>
+      )}
+
+      {/* FAIRMODE spatial analysis — via safe accessor */}
+      {fairmode && (
         <div className="rounded-xl border border-purple-800/40 bg-purple-950/20 p-3">
           <p className="text-xs font-bold text-purple-400 mb-1">🔬 FAIRMODE Spatial Analysis</p>
-          <p className="text-xs text-gray-300 leading-relaxed">{info.fairmode}</p>
+          <p className="text-xs text-gray-300 leading-relaxed">{fairmode}</p>
         </div>
       )}
     </div>
@@ -108,7 +119,7 @@ export function SourceApportionment({ pollutantKey }: { pollutantKey: PollutantK
   const RADIAN = Math.PI / 180;
   const renderCustomLabel = (props: {
     cx?: number; cy?: number; midAngle?: number;
-    innerRadius?: number; outerRadius?: number; pct?: number; name?: string;
+    innerRadius?: number; outerRadius?: number; pct?: number;
   }) => {
     const { cx = 0, cy = 0, midAngle = 0, innerRadius = 0, outerRadius = 0, pct: pctVal } = props;
     const radius = innerRadius + (outerRadius - innerRadius) * 0.6;
@@ -134,17 +145,14 @@ export function SourceApportionment({ pollutantKey }: { pollutantKey: PollutantK
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
-        {/* Donut chart */}
+        {/* Donut */}
         <ResponsiveContainer width="100%" height={200}>
           <PieChart>
             <Pie
               data={data}
-              cx="50%"
-              cy="50%"
-              innerRadius={50}
-              outerRadius={80}
-              dataKey="pct"
-              nameKey="name"
+              cx="50%" cy="50%"
+              innerRadius={50} outerRadius={80}
+              dataKey="pct" nameKey="name"
               labelLine={false}
               label={renderCustomLabel}
             >
@@ -157,7 +165,7 @@ export function SourceApportionment({ pollutantKey }: { pollutantKey: PollutantK
           </PieChart>
         </ResponsiveContainer>
 
-        {/* Horizontal bar breakdown */}
+        {/* Bar breakdown */}
         <div className="space-y-2">
           {data.map((d, i) => (
             <div key={i} className="flex items-center gap-2 text-xs">
@@ -175,7 +183,7 @@ export function SourceApportionment({ pollutantKey }: { pollutantKey: PollutantK
   );
 }
 
-// ─── AQI bands visual ─────────────────────────────────────────────────────────
+// ─── AQI Bands panel ──────────────────────────────────────────────────────────
 export function AqiBandsPanel({ pollutantKey }: { pollutantKey: PollutantKey }) {
   const info = POLLUTANT_INFO[pollutantKey];
   return (
@@ -185,21 +193,21 @@ export function AqiBandsPanel({ pollutantKey }: { pollutantKey: PollutantKey }) 
       </p>
       <div className="space-y-2">
         {info.aqiBands.map((b, i) => (
-          <div key={i} className="flex items-center gap-3 text-xs rounded-lg p-2 bg-gray-800/20">
+          <div key={i} className="flex items-center gap-3 text-xs rounded-lg p-2.5 bg-gray-800/20">
             <div className="w-3 h-3 rounded-sm shrink-0" style={{ backgroundColor: b.color }} />
-            <span className="text-gray-400 w-28 sm:w-36 shrink-0 font-mono">{b.range}</span>
+            <span className="text-gray-400 w-28 sm:w-40 shrink-0 font-mono">{b.range}</span>
             <div className="flex-1 h-1.5 bg-gray-800 rounded-full overflow-hidden">
               <div className="h-full rounded-full" style={{
                 width: `${Math.min(((i + 1) / info.aqiBands.length) * 100, 100)}%`,
                 backgroundColor: b.color,
               }} />
             </div>
-            <span className="font-bold shrink-0" style={{ color: b.color }}>{b.label}</span>
+            <span className="font-bold shrink-0 text-right w-32" style={{ color: b.color }}>{b.label}</span>
           </div>
         ))}
       </div>
       <p className="text-xs text-gray-600 mt-3 italic">
-        US EPA AQI breakpoints. Nairobi measurements regularly exceed Moderate (yellow) for PM2.5 and NO₂.
+        US EPA AQI breakpoints. Nairobi PM2.5 and NO₂ regularly exceed the Moderate (yellow) threshold.
       </p>
     </div>
   );

@@ -5,25 +5,23 @@
  */
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, Cell, ReferenceLine, Legend,
+  ResponsiveContainer, Cell,
 } from 'recharts';
-import { POLLUTANT_INFO, REGULATORY_STANDARDS } from '@/lib/aqi';
+import { POLLUTANT_INFO, getPollutantStandards, type RegulatoryStandard } from '@/lib/aqi';
 import { TOOLTIP_STYLE, AXIS_TICK, type PollutantKey } from './header';
 
-// ─── Standards comparison chart ───────────────────────────────────────────────
 export function StandardsComparison({ pollutantKey }: { pollutantKey: PollutantKey }) {
   const info = POLLUTANT_INFO[pollutantKey];
-  // Access standards directly — all POLLUTANT_INFO entries include this field
-  const standards = (info as { standards?: typeof REGULATORY_STANDARDS[string] }).standards;
-  if (!standards?.length) {
+  const standards: RegulatoryStandard[] = getPollutantStandards(pollutantKey);
+
+  if (!standards.length) {
     return (
-      <div className="rounded-2xl border border-gray-800 bg-gray-900/60 p-4 text-center text-gray-500 text-sm">
+      <div className="rounded-2xl border border-gray-800 bg-gray-900/60 p-6 text-center text-gray-500 text-sm">
         Regulatory standard data not available for this pollutant.
       </div>
     );
   }
 
-  // Build chart datasets: annual limits and daily limits side by side
   const annualData = standards
     .filter(s => s.annual !== undefined)
     .map(s => ({ name: s.shortName, limit: s.annual!, color: s.color, note: s.note, body: s.body }));
@@ -36,7 +34,10 @@ export function StandardsComparison({ pollutantKey }: { pollutantKey: PollutantK
     .filter(s => s.hourly !== undefined)
     .map(s => ({ name: s.shortName, limit: s.hourly!, color: s.color, note: s.note, body: s.body }));
 
-  const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: { payload: { body: string; limit: number; note: string } }[] }) => {
+  const CustomTooltip = ({ active, payload }: {
+    active?: boolean;
+    payload?: { payload: { body: string; limit: number; note: string } }[];
+  }) => {
     if (!active || !payload?.length) return null;
     const d = payload[0].payload;
     return (
@@ -48,8 +49,26 @@ export function StandardsComparison({ pollutantKey }: { pollutantKey: PollutantK
     );
   };
 
+  const ChartBlock = ({ data, label }: { data: typeof annualData; label: string }) => (
+    <div>
+      <p className="text-xs font-bold text-gray-500 uppercase mb-2">{label} ({info.unit})</p>
+      <ResponsiveContainer width="100%" height={150}>
+        <BarChart data={data} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" vertical={false} />
+          <XAxis dataKey="name" tick={AXIS_TICK} axisLine={false} tickLine={false} />
+          <YAxis tick={AXIS_TICK} axisLine={false} tickLine={false} width={38} />
+          <Tooltip content={<CustomTooltip />} />
+          <Bar dataKey="limit" radius={[4, 4, 0, 0]}>
+            {data.map((d, i) => <Cell key={i} fill={d.color} />)}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+
   return (
     <div className="rounded-2xl border border-gray-800 bg-gray-900/60 p-4 sm:p-5 space-y-5">
+      {/* Title */}
       <div>
         <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-0.5">
           📋 Regulatory Standards Comparison
@@ -59,61 +78,11 @@ export function StandardsComparison({ pollutantKey }: { pollutantKey: PollutantK
         </p>
       </div>
 
-      {/* Annual limits */}
-      {annualData.length > 0 && (
-        <div>
-          <p className="text-xs font-bold text-gray-500 uppercase mb-2">Annual Mean Limit ({info.unit})</p>
-          <ResponsiveContainer width="100%" height={140}>
-            <BarChart data={annualData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" vertical={false} />
-              <XAxis dataKey="name" tick={AXIS_TICK} axisLine={false} tickLine={false} />
-              <YAxis tick={AXIS_TICK} axisLine={false} tickLine={false} width={35} />
-              <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="limit" radius={[4, 4, 0, 0]} name="Annual limit">
-                {annualData.map((d, i) => <Cell key={i} fill={d.color} />)}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      )}
+      {annualData.length > 0 && <ChartBlock data={annualData} label="Annual Mean Limit" />}
+      {dailyData.length > 0  && <ChartBlock data={dailyData}  label="24-Hour Mean Limit" />}
+      {hourlyData.length > 0 && <ChartBlock data={hourlyData} label="1-Hour Limit" />}
 
-      {/* Daily limits */}
-      {dailyData.length > 0 && (
-        <div>
-          <p className="text-xs font-bold text-gray-500 uppercase mb-2">24-Hour Mean Limit ({info.unit})</p>
-          <ResponsiveContainer width="100%" height={140}>
-            <BarChart data={dailyData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" vertical={false} />
-              <XAxis dataKey="name" tick={AXIS_TICK} axisLine={false} tickLine={false} />
-              <YAxis tick={AXIS_TICK} axisLine={false} tickLine={false} width={35} />
-              <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="limit" radius={[4, 4, 0, 0]} name="24h limit">
-                {dailyData.map((d, i) => <Cell key={i} fill={d.color} />)}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      )}
-
-      {/* Hourly limits */}
-      {hourlyData.length > 0 && (
-        <div>
-          <p className="text-xs font-bold text-gray-500 uppercase mb-2">1-Hour Limit ({info.unit})</p>
-          <ResponsiveContainer width="100%" height={140}>
-            <BarChart data={hourlyData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" vertical={false} />
-              <XAxis dataKey="name" tick={AXIS_TICK} axisLine={false} tickLine={false} />
-              <YAxis tick={AXIS_TICK} axisLine={false} tickLine={false} width={35} />
-              <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="limit" radius={[4, 4, 0, 0]} name="1h limit">
-                {hourlyData.map((d, i) => <Cell key={i} fill={d.color} />)}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      )}
-
-      {/* Detailed table — scrollable on mobile */}
+      {/* Scrollable table */}
       <div className="overflow-x-auto rounded-xl border border-gray-800">
         <table className="w-full text-xs min-w-[480px]">
           <thead>
@@ -126,9 +95,7 @@ export function StandardsComparison({ pollutantKey }: { pollutantKey: PollutantK
           <tbody>
             {standards.map((s, i) => (
               <tr key={i} className="border-b border-gray-800/40 hover:bg-gray-800/20">
-                <td className="px-3 py-2.5">
-                  <span className="font-bold" style={{ color: s.color }}>{s.shortName}</span>
-                </td>
+                <td className="px-3 py-2.5 font-bold" style={{ color: s.color }}>{s.shortName}</td>
                 <td className="px-3 py-2.5 text-gray-300">{s.body}</td>
                 <td className="px-3 py-2.5 font-mono text-gray-200">{s.annual ?? '—'}</td>
                 <td className="px-3 py-2.5 font-mono text-gray-200">{s.daily ?? '—'}</td>
@@ -141,13 +108,13 @@ export function StandardsComparison({ pollutantKey }: { pollutantKey: PollutantK
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap gap-2 text-xs">
+      <div className="flex flex-wrap gap-3 text-xs">
         {standards.map(s => (
           <span key={s.shortName} className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full" style={{ background: s.color }} />
-            <span className="text-gray-400">{s.shortName}</span>
+            <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: s.color }} />
+            <span className="text-gray-400 font-medium">{s.shortName}</span>
             <span className="text-gray-600">—</span>
-            <span className="text-gray-500 truncate max-w-[120px]">{s.body}</span>
+            <span className="text-gray-500">{s.body}</span>
           </span>
         ))}
       </div>
