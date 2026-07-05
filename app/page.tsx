@@ -447,10 +447,12 @@ function HeroGaugesBanner({
   subcounties,
   userSubcountyId,
   onSelect,
+  isOutside,
 }: {
   subcounties: SubcountyData[];
   userSubcountyId: string | null;
   onSelect: (sc: SubcountyData) => void;
+  isOutside?: boolean;
 }) {
   const hero = HERO_SUBCOUNTIES.map(id => subcounties.find(s => s.id === id)).filter(Boolean) as SubcountyData[];
 
@@ -503,7 +505,7 @@ function HeroGaugesBanner({
             >
               {isUser && (
                 <span className="text-xs font-bold mb-1 flex items-center gap-1" style={{ color }}>
-                  <MapPin size={9} />You
+                  <MapPin size={9} />{isOutside ? 'Nearest' : 'You'}
                 </span>
               )}
 
@@ -557,6 +559,14 @@ function HeroGaugesBanner({
 
 import { NAIROBI_SUBCOUNTIES } from '@/lib/aqi';
 
+// Nairobi bounding box
+const NAIROBI_BOUNDS = { minLat: -1.445, maxLat: -1.155, minLng: 36.650, maxLng: 37.105 };
+
+function isInsideNairobi(lat: number, lng: number): boolean {
+  return lat >= NAIROBI_BOUNDS.minLat && lat <= NAIROBI_BOUNDS.maxLat &&
+         lng >= NAIROBI_BOUNDS.minLng && lng <= NAIROBI_BOUNDS.maxLng;
+}
+
 function nearestSubcounty(lat: number, lng: number): string {
   let best: string = NAIROBI_SUBCOUNTIES[0].id;
   let bestDist = Infinity;
@@ -565,6 +575,27 @@ function nearestSubcounty(lat: number, lng: number): string {
     if (d < bestDist) { bestDist = d; best = sc.id as string; }
   }
   return best;
+}
+
+// Reverse geocode via Nominatim OSM (free, no key required)
+async function reverseGeocode(lat: number, lng: number): Promise<string> {
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&zoom=17&format=json`,
+      { headers: { 'Accept-Language': 'en', 'User-Agent': 'AirIQ-Nairobi/1.0' } }
+    );
+    if (!res.ok) return '';
+    const data = await res.json();
+    const a = data.address ?? {};
+    // Build a concise place string: neighbourhood/suburb/road + city
+    const place = a.neighbourhood || a.suburb || a.quarter || a.residential ||
+                  a.road || a.village || a.town || '';
+    const city  = a.city || a.county || a.state_district || '';
+    if (place && city) return `${place}, ${city}`;
+    if (place) return place;
+    if (city)  return city;
+    return data.display_name?.split(',').slice(0, 2).join(',').trim() ?? '';
+  } catch { return ''; }
 }
 
 // ─── Main AirIQ Page ──────────────────────────────────────────────────────────
@@ -585,8 +616,10 @@ export default function AirIQPage() {
   const [selected, setSelected]   = useState<SubcountyData | null>(null);
   const [detailTab, setDetailTab] = useState<'detail' | 'ai'>('detail');
   const [lastRefresh, setLast]    = useState<Date | null>(null);
-  const [gpsStatus, setGpsStatus] = useState<'idle' | 'locating' | 'found' | 'error'>('idle');
+  const [gpsStatus, setGpsStatus] = useState<'idle' | 'locating' | 'found' | 'error' | 'outside'>('idle');
   const [userLocation, setUserLocation] = useState<string | null>(null);
+  const [exactPlace, setExactPlace]     = useState<string | null>(null);  // street/area from Nominatim
+  const [outsideInfo, setOutsideInfo]   = useState<string | null>(null);  // city name when outside Nairobi
 
   const fetchData = useCallback(async (silent = false) => {
     if (!silent) setLoading(true); else setRefresh(true);
@@ -606,19 +639,49 @@ export default function AirIQPage() {
     }
   }, []);
 
-  // GPS auto-detect
+  // GPS auto-detect — high accuracy (±30m), reverse geocode, outside-Nairobi check
   const detectLocation = useCallback((subcounties: SubcountyData[]) => {
     if (!navigator.geolocation) return;
     setGpsStatus('locating');
     navigator.geolocation.getCurrentPosition(
-      pos => {
-        const id = nearestSubcounty(pos.coords.latitude, pos.coords.longitude);
-        const sc = subcounties.find(s => s.id === id);
-        if (sc) { setSelected(sc); setUserLocation(sc.name); setGpsStatus('found'); }
-        else setGpsStatus('error');
+      async pos => {
+        const { latitude: lat, longitude: lng } = pos.coords;
+
+        // Check if inside Nairobi
+        if (!isInsideNairobi(lat, lng)) {
+          // Still reverse-geocode so we can show them where they actually are
+          const place = await reverseGeocode(lat, lng);
+          setOutsideInfo(place || `${lat.toFixed(4)}, ${lng.toFixed(4)}`);
+          setGpsStatus('outside');
+          // Still select nearest subcounty for reference
+          const id = nearestSubcounty(lat, lng);
+          const sc = subcounties.find(s => s.id === id);
+          if (sc) setSelected(sc);
+          return;
+        }
+
+        // Inside Nairobi — get exact place name + nearest subcounty
+        const [place, subcountyId] = await Promise.all([
+          reverseGeocode(lat, lng),
+          Promise.resolve(nearestSubcounty(lat, lng)),
+        ]);
+
+        const sc = subcounties.find(s => s.id === subcountyId);
+        if (sc) {
+          setSelected(sc);
+          setUserLocation(sc.name);
+          setExactPlace(place || null);
+          setGpsStatus('found');
+        } else {
+          setGpsStatus('error');
+        }
       },
       () => setGpsStatus('error'),
-      { timeout: 8000 }
+      {
+        enableHighAccuracy: true,  // uses GPS chip → ~10–30m accuracy
+        timeout: 12000,
+        maximumAge: 0,             // never use cached position
+      }
     );
   }, []);
 
@@ -680,8 +743,18 @@ export default function AirIQPage() {
                 </span>
               )}
               {gpsStatus === 'found' && userLocation && (
-                <span className="text-xs text-emerald-400 flex items-center gap-1">
-                  <MapPin size={12} /> <span className="max-w-[80px] truncate">{userLocation}</span>
+                <span className="text-xs text-emerald-400 flex items-center gap-1 max-w-[160px] sm:max-w-none">
+                  <MapPin size={12} className="shrink-0" />
+                  <span className="truncate">
+                    {exactPlace ? `${exactPlace}` : userLocation}
+                    {exactPlace && <span className="text-gray-500"> · {userLocation}</span>}
+                  </span>
+                </span>
+              )}
+              {gpsStatus === 'outside' && (
+                <span className="text-xs text-amber-400 flex items-center gap-1 max-w-[180px]">
+                  <MapPin size={12} className="shrink-0" />
+                  <span className="truncate">Outside Nairobi</span>
                 </span>
               )}
 
@@ -735,6 +808,26 @@ export default function AirIQPage() {
           </div>
         )}
 
+        {/* Outside Nairobi banner */}
+        {gpsStatus === 'outside' && outsideInfo && (
+          <div className="mb-5 rounded-2xl border border-amber-700/60 bg-amber-950/30 p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="text-2xl shrink-0">📍</div>
+            <div className="flex-1">
+              <p className="text-sm font-bold text-amber-400">You are outside Nairobi</p>
+              <p className="text-xs text-gray-300 mt-0.5">
+                Your location: <span className="text-white font-medium">{outsideInfo}</span>
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                AirIQ covers all 17 Nairobi subcounties. Showing the nearest subcounty for reference — data may not reflect your actual air quality.
+              </p>
+            </div>
+            <div className="shrink-0 text-xs text-amber-300 bg-amber-900/40 border border-amber-700/40 rounded-xl px-3 py-2 text-center">
+              Nearest reference:<br />
+              <span className="font-bold text-white">{selected?.name ?? '—'}</span>
+            </div>
+          </div>
+        )}
+
         {/* OVERVIEW TAB */}
         {tab === 'overview' && (
           <div>
@@ -744,6 +837,7 @@ export default function AirIQPage() {
                 subcounties={subcounties}
                 userSubcountyId={userLocation ? subcounties.find(s => s.name === userLocation)?.id ?? null : null}
                 onSelect={sc => { setSelected(sc); setDetailTab('detail'); }}
+                isOutside={gpsStatus === 'outside'}
               />
             )}
             {loading && <Sk className="h-52 rounded-2xl mb-5" />}
