@@ -268,13 +268,13 @@ The fallback is Nairobi-aware: it references matatu commutes, jua kali workshops
 
 ## 8. Healthcare Accessibility Layer
 
-The Health Nexus tab integrates data from a separate study on healthcare access in Nairobi (based on the 2019 Kenya Population Census and Ministry of Health facility datasets).
+The Health Nexus tab integrates data from a separate study on healthcare access in Nairobi (based on KNBS 2026 population projections and Kenya MoH KHIS 2023/24 facility data).
 
 Each subcounty record includes:
 
 | Field | Description |
 |-------|-------------|
-| `population` | 2019 Census count |
+| `population` | 2026 KNBS projection |
 | `healthFacilities` | Number of registered health facilities |
 | `facilitiesPerCapita` | Facilities per 10,000 residents |
 | `has24HourService` | Whether 24-hour emergency care is available |
@@ -300,7 +300,7 @@ Subcounties like **Kibra** and **Mathare** score poorly on both axes — high AQ
 | **EU AQD 2024** | EU binding limits effective 2030 | Static |
 | **Kenya NEMA 2014** | Kenya national ambient air quality standards | Static |
 | **UNEP Africa 2022** | Source apportionment data, regional recommendations | Static |
-| **Kenya MoH / 2019 Census** | Healthcare facility counts and service coverage | Static (2019) |
+| **Kenya MoH KHIS 2023/24** | Healthcare facility counts and service coverage | Static (2023/24) |
 | **FAIRMODE/EMEP** | Emission sector apportionment methodology | Static |
 
 ---
@@ -461,7 +461,7 @@ This project is linked to Vercel project `airiq` (org `team_yd6uLOmPzklRmMSTVCcg
 
 ### Healthcare Data
 
-- Healthcare data is from the **2019 Kenya Population Census** and MoH records. Facility counts may have changed.
+- Healthcare data uses **2026 KNBS population projections** (3.8% p.a. growth from 2022 census baseline). Facility counts from Kenya MoH KHIS 2023/24.
 - SDG 3 gap analysis is based on available administrative data and may not reflect ground truth.
 
 ---

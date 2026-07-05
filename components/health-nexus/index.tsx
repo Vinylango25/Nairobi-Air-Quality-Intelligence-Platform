@@ -280,7 +280,7 @@ export default function HealthNexusTab({ subcounties }: { subcounties: Subcounty
 
   // Top-level KPIs
   const kpis = [
-    { icon: <Users size={14} />,      label: 'Total Population',     value: '4.397M',  sub: '2019 Census', color: 'text-blue-400' },
+    { icon: <Users size={14} />,      label: 'Total Population',     value: '6.09M',   sub: '2026 Projection', color: 'text-blue-400' },
     { icon: <Activity size={14} />,   label: 'City Average AQI',     value: String(insights.avgAqi), sub: 'Live spatial model', color: aqiTextColor(insights.avgAqi) },
     { icon: <AlertTriangle size={14} />, label: 'Subcounties AQI>150', value: `${insights.above150}/17`, sub: 'Unhealthy or worse', color: 'text-red-400' },
     { icon: <Heart size={14} />,      label: 'No 24h Healthcare',    value: `${insights.no24h}/17`, sub: 'Subcounties', color: 'text-orange-400' },

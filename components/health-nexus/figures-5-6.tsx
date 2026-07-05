@@ -221,7 +221,7 @@ export function Fig6CIMCI() {
       </div>
 
       <p className="text-xs text-gray-600 mt-3 italic">
-        Source: 2019 Kenya Census (under-5 = 11.8% of subcounty pop.) · Kenya MoH C-IMCI programme data
+        Source: KNBS 2026 Projection (under-5 est. 11.5% of subcounty pop.) · Kenya MoH C-IMCI programme data
       </p>
     </div>
   );

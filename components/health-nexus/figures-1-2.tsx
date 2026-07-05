@@ -26,7 +26,7 @@ import { HEALTHCARE_DATA, getVulnerabilityScore } from '@/lib/healthcare';
 import { aqiColor, aqiTextColor } from '@/lib/aqi';
 import type { SubcountyData } from '@/lib/types';
 
-// ─── Fig 1 data: Nairobi age distribution (2019 Kenya Census) ────────────────
+// ─── Fig 1 data: Nairobi age distribution (2026 KNBS Projection) ─────────────────
 const AGE_DISTRIBUTION = [
   { group: '0–4',   pct: 11.8, fill: '#06b6d4' },
   { group: '5–9',   pct: 10.2, fill: '#06b6d4' },
@@ -43,7 +43,7 @@ const AGE_DISTRIBUTION = [
   { group: '60+',   pct: 1.3,  fill: '#ef4444' },
 ];
 
-// ─── Fig 2 data: Population density by subcounty (2019 Census) ───────────────
+// ─── Fig 2 data: Population density by subcounty (2026 Projection) ───────────────
 const POP_DENSITY = [
   { name: 'Mathare',         density: 62500, pop: 181000, color: '#ef4444' },
   { name: 'Kamukunji',       density: 54200, pop: 165000, color: '#ef4444' },
@@ -103,8 +103,8 @@ function Fig1AgeDistribution() {
     <div className="rounded-2xl border border-gray-800 bg-gray-900/60 p-4 sm:p-5">
       <SectionTitle
         icon="👥"
-        title="Fig 1 — Nairobi Age Distribution (2019 Census)"
-        subtitle="Youth bulge: 70%+ of Nairobi's 4.397M residents are under 35. Children under 5 represent 11.8% — driving demand for pediatric and maternal services."
+        title="Fig 1 — Nairobi Age Distribution (2026 Projection)"
+        subtitle="Youth bulge: 70%+ of Nairobi's 6.09M residents are under 35. Children under 5 represent 11.8% — driving demand for pediatric and maternal services."
       />
       <div className="flex flex-wrap gap-3 mb-3 text-xs">
         {[
@@ -132,7 +132,7 @@ function Fig1AgeDistribution() {
         </BarChart>
       </ResponsiveContainer>
       <p className="text-xs text-gray-600 mt-2 italic">
-        Source: 2019 Kenya National Population Census · Nairobi County
+        Source: KNBS 2026 Projection (base: 2022 Census) · Nairobi County
       </p>
     </div>
   );
@@ -163,7 +163,7 @@ function Fig2PopulationDensity() {
         </BarChart>
       </ResponsiveContainer>
       <p className="text-xs text-gray-600 mt-2 italic">
-        Source: 2019 Kenya Census · Note: Embakasi subcounties share the wider Embakasi constituency
+        Source: KNBS 2026 Projection · Note: Embakasi subcounties share the wider Embakasi constituency
       </p>
     </div>
   );
