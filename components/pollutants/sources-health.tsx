@@ -106,12 +106,11 @@ export function SourceApportionment({ pollutantKey }: { pollutantKey: PollutantK
   if (!data.length) return null;
 
   const RADIAN = Math.PI / 180;
-  const renderCustomLabel = ({
-    cx, cy, midAngle, innerRadius, outerRadius, pct: pctVal, name,
-  }: {
-    cx: number; cy: number; midAngle: number;
-    innerRadius: number; outerRadius: number; pct?: number; name: string;
+  const renderCustomLabel = (props: {
+    cx?: number; cy?: number; midAngle?: number;
+    innerRadius?: number; outerRadius?: number; pct?: number; name?: string;
   }) => {
+    const { cx = 0, cy = 0, midAngle = 0, innerRadius = 0, outerRadius = 0, pct: pctVal } = props;
     const radius = innerRadius + (outerRadius - innerRadius) * 0.6;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);

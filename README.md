@@ -2,8 +2,8 @@
 
 > **Live air quality monitoring, health recommendations, and pollutant analytics for all 17 Nairobi subcounties.**
 
-Live Dashboard: *(add Vercel URL here)*  
-GitHub: *(add GitHub URL here)*
+Live Dashboard: **https://airiq-ivory.vercel.app**  
+GitHub: **https://github.com/Vinylango25/Nairobi-Air-Quality-Intelligence-Platform**
 
 ---
 
@@ -481,4 +481,5 @@ This project is linked to Vercel project `airiq` (org `team_yd6uLOmPzklRmMSTVCcg
 
 *Built with Next.js 16, TypeScript, Tailwind CSS v4, Recharts, Google Gemini, and the WAQI API.*  
 *Healthcare data from the [Nairobi Healthcare Accessibility Study](https://github.com/Vinylango25/Healthcare-Accessibility-in-Nairobi).*  
-*Air quality standards: US EPA NAAQS, EU AQD 2024, WHO 2021, Kenya NEMA 2014, UNEP Africa.*
+*Air quality standards: US EPA NAAQS, EU AQD 2024, WHO 2021, Kenya NEMA 2014, UNEP Africa.*  
+*Live at: https://airiq-ivory.vercel.app*
