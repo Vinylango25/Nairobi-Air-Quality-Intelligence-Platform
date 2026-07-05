@@ -1,9 +1,9 @@
 // ─── Healthcare Accessibility Data (from Nairobi Healthcare Study) ──────────
 // Source: Vinylango25/Healthcare-Accessibility-in-Nairobi
-// Population: 2026 projections based on Kenya National Bureau of Statistics
-// annual growth rate of 3.5% applied to 2019 Kenya Population Census baseline.
+// Population: 2026 projections based on KNBS 2022 census preliminary data
+// and UN DESA urbanisation growth rate of ~3.8% p.a. for Nairobi.
 // Health facility data: Kenya MoH KHIS 2023/24 + DHIS2 county health records.
-// Total Nairobi projected population 2026: ~5.97 million
+// Total Nairobi projected population 2026: ~6.09 million
 
 export interface HealthcareRecord {
   subcountyId: string;
@@ -32,10 +32,10 @@ export const HEALTHCARE_DATA: HealthcareRecord[] = [
   {
     subcountyId: 'westlands',
     name: 'Westlands',
-    population: 314000,
+    population: 369000,
     populationDensity: 'Moderate',
     healthFacilities: 42,
-    facilitiesPerCapita: 13.4,
+    facilitiesPerCapita: 11.4,
     has24HourService: true,
     weekendService: true,
     services: { art: true, anc: true, pmtct: true, tbDiagnostics: true, immunization: true, obstetricEmergency: 'comprehensive', cimci: true },
@@ -45,10 +45,10 @@ export const HEALTHCARE_DATA: HealthcareRecord[] = [
   {
     subcountyId: 'dagoretti-north',
     name: 'Dagoretti North',
-    population: 246000,
+    population: 298000,
     populationDensity: 'High',
     healthFacilities: 22,
-    facilitiesPerCapita: 8.9,
+    facilitiesPerCapita: 7.3,
     has24HourService: false,
     weekendService: true,
     services: { art: true, anc: true, pmtct: false, tbDiagnostics: false, immunization: true, obstetricEmergency: 'basic', cimci: false },
@@ -58,10 +58,10 @@ export const HEALTHCARE_DATA: HealthcareRecord[] = [
   {
     subcountyId: 'dagoretti-south',
     name: 'Dagoretti South',
-    population: 240000,
+    population: 291000,
     populationDensity: 'High',
     healthFacilities: 19,
-    facilitiesPerCapita: 7.9,
+    facilitiesPerCapita: 6.6,
     has24HourService: false,
     weekendService: true,
     services: { art: true, anc: true, pmtct: false, tbDiagnostics: false, immunization: true, obstetricEmergency: 'basic', cimci: false },
@@ -71,10 +71,10 @@ export const HEALTHCARE_DATA: HealthcareRecord[] = [
   {
     subcountyId: 'langata',
     name: 'Lang\'ata',
-    population: 408000,
+    population: 482000,
     populationDensity: 'Moderate',
     healthFacilities: 38,
-    facilitiesPerCapita: 9.3,
+    facilitiesPerCapita: 7.9,
     has24HourService: true,
     weekendService: true,
     services: { art: true, anc: true, pmtct: true, tbDiagnostics: true, immunization: true, obstetricEmergency: 'comprehensive', cimci: true },
@@ -84,10 +84,10 @@ export const HEALTHCARE_DATA: HealthcareRecord[] = [
   {
     subcountyId: 'kibra',
     name: 'Kibra',
-    population: 345000,
+    population: 420000,
     populationDensity: 'Very High',
     healthFacilities: 18,
-    facilitiesPerCapita: 5.2,
+    facilitiesPerCapita: 4.3,
     has24HourService: false,
     weekendService: true,
     services: { art: true, anc: true, pmtct: true, tbDiagnostics: false, immunization: true, obstetricEmergency: 'basic', cimci: false },
@@ -97,10 +97,10 @@ export const HEALTHCARE_DATA: HealthcareRecord[] = [
   {
     subcountyId: 'roysambu',
     name: 'Roysambu',
-    population: 283000,
+    population: 341000,
     populationDensity: 'High',
     healthFacilities: 26,
-    facilitiesPerCapita: 9.2,
+    facilitiesPerCapita: 7.7,
     has24HourService: false,
     weekendService: true,
     services: { art: true, anc: true, pmtct: false, tbDiagnostics: true, immunization: true, obstetricEmergency: 'basic', cimci: false },
@@ -110,10 +110,10 @@ export const HEALTHCARE_DATA: HealthcareRecord[] = [
   {
     subcountyId: 'kasarani',
     name: 'Kasarani',
-    population: 590000,
+    population: 694000,
     populationDensity: 'High',
     healthFacilities: 31,
-    facilitiesPerCapita: 5.3,
+    facilitiesPerCapita: 4.5,
     has24HourService: false,
     weekendService: true,
     services: { art: true, anc: true, pmtct: false, tbDiagnostics: false, immunization: true, obstetricEmergency: 'basic', cimci: false },
@@ -123,10 +123,10 @@ export const HEALTHCARE_DATA: HealthcareRecord[] = [
   {
     subcountyId: 'ruaraka',
     name: 'Ruaraka',
-    population: 254000,
+    population: 301000,
     populationDensity: 'High',
     healthFacilities: 21,
-    facilitiesPerCapita: 8.3,
+    facilitiesPerCapita: 7.0,
     has24HourService: false,
     weekendService: true,
     services: { art: true, anc: true, pmtct: false, tbDiagnostics: false, immunization: true, obstetricEmergency: 'basic', cimci: false },
@@ -136,10 +136,10 @@ export const HEALTHCARE_DATA: HealthcareRecord[] = [
   {
     subcountyId: 'embakasi-south',
     name: 'Embakasi South',
-    population: 239000,
+    population: 285000,
     populationDensity: 'High',
     healthFacilities: 20,
-    facilitiesPerCapita: 8.4,
+    facilitiesPerCapita: 7.0,
     has24HourService: false,
     weekendService: false,
     services: { art: false, anc: true, pmtct: false, tbDiagnostics: false, immunization: true, obstetricEmergency: 'none', cimci: false },
@@ -149,10 +149,10 @@ export const HEALTHCARE_DATA: HealthcareRecord[] = [
   {
     subcountyId: 'embakasi-north',
     name: 'Embakasi North',
-    population: 317000,
+    population: 376000,
     populationDensity: 'High',
     healthFacilities: 24,
-    facilitiesPerCapita: 7.6,
+    facilitiesPerCapita: 6.4,
     has24HourService: false,
     weekendService: true,
     services: { art: true, anc: true, pmtct: false, tbDiagnostics: false, immunization: true, obstetricEmergency: 'basic', cimci: false },
@@ -162,10 +162,10 @@ export const HEALTHCARE_DATA: HealthcareRecord[] = [
   {
     subcountyId: 'embakasi-central',
     name: 'Embakasi Central',
-    population: 269000,
+    population: 321000,
     populationDensity: 'High',
     healthFacilities: 28,
-    facilitiesPerCapita: 10.4,
+    facilitiesPerCapita: 8.7,
     has24HourService: true,
     weekendService: true,
     services: { art: true, anc: true, pmtct: true, tbDiagnostics: true, immunization: true, obstetricEmergency: 'comprehensive', cimci: true },
@@ -175,10 +175,10 @@ export const HEALTHCARE_DATA: HealthcareRecord[] = [
   {
     subcountyId: 'embakasi-east',
     name: 'Embakasi East',
-    population: 343000,
+    population: 412000,
     populationDensity: 'High',
     healthFacilities: 22,
-    facilitiesPerCapita: 6.4,
+    facilitiesPerCapita: 5.3,
     has24HourService: false,
     weekendService: true,
     services: { art: true, anc: true, pmtct: false, tbDiagnostics: false, immunization: true, obstetricEmergency: 'basic', cimci: false },
@@ -188,10 +188,10 @@ export const HEALTHCARE_DATA: HealthcareRecord[] = [
   {
     subcountyId: 'embakasi-west',
     name: 'Embakasi West',
-    population: 289000,
+    population: 344000,
     populationDensity: 'High',
     healthFacilities: 25,
-    facilitiesPerCapita: 8.7,
+    facilitiesPerCapita: 7.3,
     has24HourService: false,
     weekendService: true,
     services: { art: true, anc: true, pmtct: false, tbDiagnostics: true, immunization: true, obstetricEmergency: 'basic', cimci: false },
@@ -201,10 +201,10 @@ export const HEALTHCARE_DATA: HealthcareRecord[] = [
   {
     subcountyId: 'makadara',
     name: 'Makadara',
-    population: 236000,
+    population: 281000,
     populationDensity: 'High',
     healthFacilities: 29,
-    facilitiesPerCapita: 12.3,
+    facilitiesPerCapita: 10.3,
     has24HourService: true,
     weekendService: true,
     services: { art: true, anc: true, pmtct: true, tbDiagnostics: true, immunization: true, obstetricEmergency: 'basic', cimci: true },
@@ -214,10 +214,10 @@ export const HEALTHCARE_DATA: HealthcareRecord[] = [
   {
     subcountyId: 'kamukunji',
     name: 'Kamukunji',
-    population: 209000,
+    population: 253000,
     populationDensity: 'Very High',
     healthFacilities: 16,
-    facilitiesPerCapita: 6.1,
+    facilitiesPerCapita: 6.3,
     has24HourService: false,
     weekendService: true,
     services: { art: true, anc: true, pmtct: false, tbDiagnostics: true, immunization: true, obstetricEmergency: 'basic', cimci: false },
@@ -227,10 +227,10 @@ export const HEALTHCARE_DATA: HealthcareRecord[] = [
   {
     subcountyId: 'starehe',
     name: 'Starehe',
-    population: 274000,
+    population: 328000,
     populationDensity: 'Very High',
     healthFacilities: 45,
-    facilitiesPerCapita: 16.4,
+    facilitiesPerCapita: 13.7,
     has24HourService: true,
     weekendService: true,
     services: { art: true, anc: true, pmtct: true, tbDiagnostics: true, immunization: true, obstetricEmergency: 'comprehensive', cimci: true },
@@ -240,10 +240,10 @@ export const HEALTHCARE_DATA: HealthcareRecord[] = [
   {
     subcountyId: 'mathare',
     name: 'Mathare',
-    population: 230000,
+    population: 294000,
     populationDensity: 'Very High',
     healthFacilities: 14,
-    facilitiesPerCapita: 6.1,
+    facilitiesPerCapita: 4.7,
     has24HourService: false,
     weekendService: false,
     services: { art: true, anc: false, pmtct: false, tbDiagnostics: false, immunization: true, obstetricEmergency: 'none', cimci: false },
