@@ -196,7 +196,7 @@ function DetailPanel({ sc }: { sc: SubcountyData }) {
     <div className="space-y-4">
       {/* Hero gauge + pollutant pills */}
       <div className="rounded-2xl border border-gray-800 bg-gray-900/60 p-5">
-        <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div>
             <h2 className="text-xl font-extrabold text-white">{sc.name}</h2>
             <p className="text-sm text-gray-400 mt-0.5 flex items-center gap-1.5">
@@ -207,7 +207,7 @@ function DetailPanel({ sc }: { sc: SubcountyData }) {
               Updated {new Date(sc.lastUpdated).toLocaleTimeString('en-KE')} EAT
             </p>
           </div>
-          <HeroGauge aqi={sc.aqi} label={sc.name} size={180} />
+          <HeroGauge aqi={sc.aqi} label={sc.name} size={160} />
         </div>
 
         {/* Pollutant pills */}
@@ -468,7 +468,7 @@ function HeroGaugesBanner({
         </span>
       </div>
 
-      <div className="grid grid-cols-5 gap-2">
+      <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
         {hero.map(sc => {
           const color = aqiColor(sc.aqi);
           const isUser = sc.id === userSubcountyId;
@@ -656,19 +656,19 @@ export default function AirIQPage() {
         <div className="max-w-7xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-center gap-3 shrink-0">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-teal-500 to-emerald-700 flex items-center justify-center text-xl shadow-lg">💨</div>
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-br from-teal-500 to-emerald-700 flex items-center justify-center text-lg sm:text-xl shadow-lg">💨</div>
               <div>
-                <span className="text-xl font-extrabold tracking-tight text-white">AirIQ</span>
-                <span className="text-xs text-gray-500 ml-2 hidden sm:inline">Nairobi Air Quality Intelligence</span>
+                <span className="text-lg sm:text-xl font-extrabold tracking-tight text-white">AirIQ</span>
+                <span className="text-xs text-gray-500 ml-2 hidden xs:inline">Nairobi Air Quality</span>
               </div>
             </div>
 
             <div className="flex items-center gap-2 flex-wrap">
               {/* City AQI */}
               {!loading && data && (
-                <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-sm font-bold ${aqiBgColor(data.cityAqi)}`}>
+                <div className={`flex items-center gap-2 px-2.5 py-1.5 rounded-full border text-sm font-bold ${aqiBgColor(data.cityAqi)}`}>
                   <span className="live-pulse w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: aqiColor(data.cityAqi) }} />
-                  <span style={{ color: aqiColor(data.cityAqi) }}>City AQI {data.cityAqi}</span>
+                  <span style={{ color: aqiColor(data.cityAqi) }}>AQI {data.cityAqi}</span>
                   <span className="text-gray-500 font-normal text-xs hidden sm:inline">{data.cityCategory}</span>
                 </div>
               )}
@@ -676,12 +676,12 @@ export default function AirIQPage() {
               {/* GPS status */}
               {gpsStatus === 'locating' && (
                 <span className="text-xs text-blue-400 flex items-center gap-1">
-                  <MapPin size={12} className="animate-bounce" /> Locating…
+                  <MapPin size={12} className="animate-bounce" /><span className="hidden sm:inline">Locating…</span>
                 </span>
               )}
               {gpsStatus === 'found' && userLocation && (
                 <span className="text-xs text-emerald-400 flex items-center gap-1">
-                  <MapPin size={12} /> {userLocation}
+                  <MapPin size={12} /> <span className="max-w-[80px] truncate">{userLocation}</span>
                 </span>
               )}
 
@@ -714,21 +714,21 @@ export default function AirIQPage() {
       </header>
 
       {/* Tabs */}
-      <div className="border-b border-gray-800/60 sticky top-[73px] z-30 backdrop-blur-md" style={{ background: 'rgba(7,7,18,0.96)' }}>
-        <div className="max-w-7xl mx-auto px-4 flex">
+      <div className="border-b border-gray-800/60 sticky top-[65px] sm:top-[73px] z-30 backdrop-blur-md" style={{ background: 'rgba(7,7,18,0.96)' }}>
+        <div className="max-w-7xl mx-auto px-4 flex overflow-x-auto no-scrollbar">
           {TABS.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
-              className={`flex items-center gap-1.5 px-4 py-3.5 text-sm font-medium border-b-2 transition-all ${
+              className={`flex items-center gap-1.5 px-3 sm:px-4 py-3 sm:py-3.5 text-xs sm:text-sm font-medium border-b-2 transition-all whitespace-nowrap shrink-0 ${
                 tab === t.id ? 'border-teal-500 text-white' : 'border-transparent text-gray-500 hover:text-gray-300'
               }`}>
               <span>{t.icon}</span>
-              <span className="hidden sm:inline">{t.label}</span>
+              <span>{t.label}</span>
             </button>
           ))}
         </div>
       </div>
 
-      <main className="max-w-7xl mx-auto px-4 py-6">
+      <main className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
         {error && (
           <div className="mb-5 p-4 rounded-xl bg-red-950/40 border border-red-700/60 text-red-300 text-sm flex items-center gap-2">
             <AlertTriangle size={16} />{error}
@@ -751,7 +751,7 @@ export default function AirIQPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
             {/* Subcounty list */}
-            <div className="lg:col-span-1 space-y-2 max-h-[82vh] overflow-y-auto pr-1">
+            <div className="lg:col-span-1 space-y-2 lg:max-h-[82vh] lg:overflow-y-auto pr-1">
               <div className="flex items-center justify-between mb-2 px-1">
                 <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">Subcounties</p>
                 {gpsStatus === 'found' && (

@@ -11,6 +11,10 @@ body {
 ::-webkit-scrollbar-thumb { background: #2d2d44; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #3d3d60; }
 
+/* Hide scrollbar but keep scroll functionality */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
 .aiq-card { transition: transform 0.15s ease, border-color 0.15s ease; }
 .aiq-card:hover { transform: translateY(-2px); }
 

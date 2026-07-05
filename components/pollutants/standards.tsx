@@ -7,21 +7,21 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Cell, ReferenceLine, Legend,
 } from 'recharts';
-import { POLLUTANT_INFO } from '@/lib/aqi';
+import { POLLUTANT_INFO, REGULATORY_STANDARDS } from '@/lib/aqi';
 import { TOOLTIP_STYLE, AXIS_TICK, type PollutantKey } from './header';
 
 // ─── Standards comparison chart ───────────────────────────────────────────────
 export function StandardsComparison({ pollutantKey }: { pollutantKey: PollutantKey }) {
   const info = POLLUTANT_INFO[pollutantKey];
-  if (!('standards' in info) || !info.standards?.length) {
+  // Access standards directly — all POLLUTANT_INFO entries include this field
+  const standards = (info as { standards?: typeof REGULATORY_STANDARDS[string] }).standards;
+  if (!standards?.length) {
     return (
       <div className="rounded-2xl border border-gray-800 bg-gray-900/60 p-4 text-center text-gray-500 text-sm">
         Regulatory standard data not available for this pollutant.
       </div>
     );
   }
-
-  const standards = info.standards;
 
   // Build chart datasets: annual limits and daily limits side by side
   const annualData = standards
@@ -64,10 +64,10 @@ export function StandardsComparison({ pollutantKey }: { pollutantKey: PollutantK
         <div>
           <p className="text-xs font-bold text-gray-500 uppercase mb-2">Annual Mean Limit ({info.unit})</p>
           <ResponsiveContainer width="100%" height={140}>
-            <BarChart data={annualData} margin={{ top: 5, right: 30, left: -15, bottom: 0 }}>
+            <BarChart data={annualData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" vertical={false} />
               <XAxis dataKey="name" tick={AXIS_TICK} axisLine={false} tickLine={false} />
-              <YAxis tick={AXIS_TICK} axisLine={false} tickLine={false} />
+              <YAxis tick={AXIS_TICK} axisLine={false} tickLine={false} width={35} />
               <Tooltip content={<CustomTooltip />} />
               <Bar dataKey="limit" radius={[4, 4, 0, 0]} name="Annual limit">
                 {annualData.map((d, i) => <Cell key={i} fill={d.color} />)}
@@ -82,10 +82,10 @@ export function StandardsComparison({ pollutantKey }: { pollutantKey: PollutantK
         <div>
           <p className="text-xs font-bold text-gray-500 uppercase mb-2">24-Hour Mean Limit ({info.unit})</p>
           <ResponsiveContainer width="100%" height={140}>
-            <BarChart data={dailyData} margin={{ top: 5, right: 30, left: -15, bottom: 0 }}>
+            <BarChart data={dailyData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" vertical={false} />
               <XAxis dataKey="name" tick={AXIS_TICK} axisLine={false} tickLine={false} />
-              <YAxis tick={AXIS_TICK} axisLine={false} tickLine={false} />
+              <YAxis tick={AXIS_TICK} axisLine={false} tickLine={false} width={35} />
               <Tooltip content={<CustomTooltip />} />
               <Bar dataKey="limit" radius={[4, 4, 0, 0]} name="24h limit">
                 {dailyData.map((d, i) => <Cell key={i} fill={d.color} />)}
@@ -100,10 +100,10 @@ export function StandardsComparison({ pollutantKey }: { pollutantKey: PollutantK
         <div>
           <p className="text-xs font-bold text-gray-500 uppercase mb-2">1-Hour Limit ({info.unit})</p>
           <ResponsiveContainer width="100%" height={140}>
-            <BarChart data={hourlyData} margin={{ top: 5, right: 30, left: -15, bottom: 0 }}>
+            <BarChart data={hourlyData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" vertical={false} />
               <XAxis dataKey="name" tick={AXIS_TICK} axisLine={false} tickLine={false} />
-              <YAxis tick={AXIS_TICK} axisLine={false} tickLine={false} />
+              <YAxis tick={AXIS_TICK} axisLine={false} tickLine={false} width={35} />
               <Tooltip content={<CustomTooltip />} />
               <Bar dataKey="limit" radius={[4, 4, 0, 0]} name="1h limit">
                 {hourlyData.map((d, i) => <Cell key={i} fill={d.color} />)}

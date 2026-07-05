@@ -4,12 +4,6 @@
  * Standards: US EPA NAAQS, EU AQD 2024, WHO 2021, Kenya NEMA 2014, UNEP Africa
  * Includes FAIRMODE source apportionment, AQI bands, Nairobi context
  */
-import { useState } from 'react';
-import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, Cell, ReferenceLine, RadarChart,
-  Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend,
-} from 'recharts';
 import { POLLUTANT_INFO } from '@/lib/aqi';
 
 const TOOLTIP_STYLE = {
