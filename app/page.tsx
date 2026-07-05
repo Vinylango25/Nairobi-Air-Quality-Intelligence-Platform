@@ -618,8 +618,9 @@ export default function AirIQPage() {
   const [lastRefresh, setLast]    = useState<Date | null>(null);
   const [gpsStatus, setGpsStatus] = useState<'idle' | 'locating' | 'found' | 'error' | 'outside'>('idle');
   const [userLocation, setUserLocation] = useState<string | null>(null);
-  const [exactPlace, setExactPlace]     = useState<string | null>(null);  // street/area from Nominatim
-  const [outsideInfo, setOutsideInfo]   = useState<string | null>(null);  // city name when outside Nairobi
+  const [exactPlace, setExactPlace]           = useState<string | null>(null);  // street/area from Nominatim
+  const [outsideInfo, setOutsideInfo]         = useState<string | null>(null);  // city name when outside Nairobi
+  const [nearestSubcountyName, setNearestSC]  = useState<string | null>(null);  // nearest Nairobi subcounty when outside
 
   const fetchData = useCallback(async (silent = false) => {
     if (!silent) setLoading(true); else setRefresh(true);
@@ -653,10 +654,10 @@ export default function AirIQPage() {
           const place = await reverseGeocode(lat, lng);
           setOutsideInfo(place || `${lat.toFixed(4)}, ${lng.toFixed(4)}`);
           setGpsStatus('outside');
-          // Still select nearest subcounty for reference
+          // Still select nearest subcounty for reference and name it explicitly
           const id = nearestSubcounty(lat, lng);
           const sc = subcounties.find(s => s.id === id);
-          if (sc) setSelected(sc);
+          if (sc) { setSelected(sc); setNearestSC(sc.name); }
           return;
         }
 
@@ -801,30 +802,32 @@ export default function AirIQPage() {
         </div>
       </div>
 
+      {/* ── Outside-Nairobi notice — sits directly under the tab bar ── */}
+      {gpsStatus === 'outside' && outsideInfo && (
+        <div className="border-b border-amber-800/40 bg-amber-950/40 backdrop-blur-sm">
+          <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2.5 flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-4">
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-amber-400 text-base">📍</span>
+              <span className="text-xs font-bold text-amber-400">Outside Nairobi</span>
+            </div>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-xs flex-1 min-w-0">
+              <span className="text-gray-300">
+                Your location: <span className="text-white font-semibold">{outsideInfo}</span>
+              </span>
+              <span className="text-gray-600 hidden sm:inline">·</span>
+              <span className="text-gray-400">
+                Nearest Nairobi subcounty: <span className="text-amber-300 font-bold">{nearestSubcountyName ?? selected?.name ?? '—'}</span>
+              </span>
+            </div>
+            <span className="text-xs text-gray-600 shrink-0 hidden md:block">Data shown is for reference only</span>
+          </div>
+        </div>
+      )}
+
       <main className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
         {error && (
           <div className="mb-5 p-4 rounded-xl bg-red-950/40 border border-red-700/60 text-red-300 text-sm flex items-center gap-2">
             <AlertTriangle size={16} />{error}
-          </div>
-        )}
-
-        {/* Outside Nairobi banner */}
-        {gpsStatus === 'outside' && outsideInfo && (
-          <div className="mb-5 rounded-2xl border border-amber-700/60 bg-amber-950/30 p-4 flex flex-col sm:flex-row sm:items-center gap-3">
-            <div className="text-2xl shrink-0">📍</div>
-            <div className="flex-1">
-              <p className="text-sm font-bold text-amber-400">You are outside Nairobi</p>
-              <p className="text-xs text-gray-300 mt-0.5">
-                Your location: <span className="text-white font-medium">{outsideInfo}</span>
-              </p>
-              <p className="text-xs text-gray-500 mt-1">
-                AirIQ covers all 17 Nairobi subcounties. Showing the nearest subcounty for reference — data may not reflect your actual air quality.
-              </p>
-            </div>
-            <div className="shrink-0 text-xs text-amber-300 bg-amber-900/40 border border-amber-700/40 rounded-xl px-3 py-2 text-center">
-              Nearest reference:<br />
-              <span className="font-bold text-white">{selected?.name ?? '—'}</span>
-            </div>
           </div>
         )}
 
